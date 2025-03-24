@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+
+# Creating the dataset based on your provided data
+data = {
+    'Year': [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    'Single-detached': [75515, 68125, 74089, 76843, 65940, 55869, 60023, 82116, 72647, 54616, 54508],
+    'Multiples': [113814, 127410, 123827, 142920, 146903, 152816, 157857, 189082, 189202, 185651, 190859],
+    'Semi-detached': [13407, 11047, 10830, 12291, 10992, 10018, 11398, 13276, 11429, 9440, 10466],
+    'Row': [21448, 21611, 22653, 28046, 23510, 25147, 23508, 28594, 29735, 25223, 25466],
+    'Apartment and other unit types': [78959, 94752, 90344, 102583, 112401, 117651, 122951, 147212, 148038, 150988, 154927],
+    'Total Unit': [303143, 322945, 321743, 362683, 359746, 361501, 375737, 460280, 451051, 425918, 436226]
+}
+
+# Convert the dataset into DataFrame
+df = pd.DataFrame(data)
+
+# Prediction for future years (2025-2044)
+future_years = np.array([i for i in range(2025, 2045)]).reshape(-1, 1)
+
+# **Linear Regression Model for Multiples, Apartment and other unit types, Total Unit**
+linear_columns = ['Multiples', 'Apartment and other unit types', 'Total Unit']
+linear_model = LinearRegression()
+
+# **Random Forest Model for Single-detached, Semi-detached, Row**
+rf_columns = ['Single-detached', 'Semi-detached', 'Row']
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Store predictions
+predictions = {}
+
+# Linear Regression Predictions
+for column in linear_columns:
+    X = df['Year'].values.reshape(-1, 1)
+    y = df[column].values
+    linear_model.fit(X, y)
+    predictions[column] = linear_model.predict(future_years)
+
+# Random Forest Predictions
+for column in rf_columns:
+    X = df['Year'].values.reshape(-1, 1)
+    y = df[column].values
+    rf_model.fit(X, y)
+    predictions[column] = rf_model.predict(future_years)
+
+# Display predicted results
+predicted_df = pd.DataFrame(future_years, columns=['Year'])
+for column in predictions:
+    predicted_df[column] = predictions[column]
+
+# Show the predicted values
+print(predicted_df)
